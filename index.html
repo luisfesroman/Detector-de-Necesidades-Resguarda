@@ -179,6 +179,43 @@
   .scenopt input[type=radio]{width:20px;height:20px;flex:0 0 20px;accent-color:var(--orange);margin:0;padding:0}
   .scenopt b{font-size:16px;font-weight:800;color:var(--blue);white-space:nowrap}
   .scenopt.sel b{color:var(--orange-d)}
+  /* ---- prioridades: colores temáticos + panel inteligente ---- */
+  .prio{border-left:4px solid transparent;padding-left:11px;border-radius:9px;transition:background .25s,border-color .25s}
+  .prio.th-fam{border-color:#E86A9B}
+  .prio.th-ret{border-color:#33414F}
+  .prio.th-pro{border-color:var(--orange)}
+  .prio.th-blu{border-color:var(--blue-l)}
+  .prio.hot{background:#f5f8fc}
+  .prio.th-fam.hot{background:#fdeef4}
+  .prio.th-ret.hot{background:#eaeef3}
+  .prio.th-pro.hot{background:#fff6ec}
+  .prio.th-blu.hot{background:#eef5fd}
+  .smart{margin-top:2px}
+  .smart-hint{background:var(--blue-bg);color:var(--blue-d);border-radius:14px;padding:14px 16px;font-size:14px;
+    font-weight:600;line-height:1.5}
+  .smart-h{font-size:16.5px;font-weight:800;color:var(--blue);margin:4px 0 1px}
+  .smart-sub{font-size:13px;color:var(--muted);margin-bottom:11px}
+  .smart-card{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;
+    border:none;border-left:5px solid var(--blue-l);border-radius:12px;background:#fff;box-shadow:0 4px 12px rgba(4,81,165,.08);
+    padding:13px 15px;margin-bottom:9px;cursor:pointer;font-family:inherit;transition:transform .12s,box-shadow .2s}
+  .smart-card:active{transform:scale(.98)}
+  .smart-lab{font-size:14.5px;font-weight:800;color:var(--ink);line-height:1.25}
+  .smart-go{font-size:12.5px;font-weight:800;white-space:nowrap;color:var(--blue-l)}
+  .smart-card.th-fam{border-left-color:#E86A9B;background:#fdeef4}.smart-card.th-fam .smart-go{color:#B23A6B}
+  .smart-card.th-ret{border-left-color:#33414F;background:#eef1f5}.smart-card.th-ret .smart-go{color:#33414F}
+  .smart-card.th-pro{border-left-color:var(--orange);background:#fff6ec}.smart-card.th-pro .smart-go{color:var(--orange-d)}
+  .smart-card.th-blu{border-left-color:var(--blue-l);background:#eef5fd}.smart-card.th-blu .smart-go{color:var(--blue)}
+  /* ---- temas de sección (familia / retiro) ---- */
+  .step.t-fam{background:#FDEBF1;border:1px solid #F5CBDD;border-radius:18px;padding:16px 13px}
+  .step.t-fam .snum{background:linear-gradient(135deg,#E86A9B,#C74B7D)}
+  .step.t-fam .stitle{color:#B23A6B}
+  .step.t-fam .feel{background:#FBDCE8;color:#8f2f57;border-color:#E86A9B}
+  .step.t-fam .qb{background:#FBDCE8;color:#B23A6B}
+  .step.t-ret{background:#E7ECF1;border:1px solid #C6D0DB;border-radius:18px;padding:16px 13px}
+  .step.t-ret .snum{background:linear-gradient(135deg,#3B4A59,#26313D)}
+  .step.t-ret .stitle{color:#33414F}
+  .step.t-ret .feel{background:#33414F;color:#EAF0F6;border-color:#1f2a36}
+  .step.t-ret .qb{background:#d7dee6;color:#33414F}
 </style>
 </head>
 <body>
@@ -241,6 +278,7 @@
   <p class="ssub">Del 1 al 10, ¿qué tan importante es para ti? Desliza cada barra.</p>
   <div class="feel b">El orden de tus prioridades dice mucho de lo que más amas. No hay respuestas correctas, solo las tuyas.</div>
   <div class="card" id="prioCard"></div>
+  <div class="smart" id="prioSmart"></div>
 </section>
 
 <!-- 3 COBERTURAS -->
@@ -286,7 +324,7 @@
 </section>
 
 <!-- 4 FAMILIA -->
-<section class="step" data-step>
+<section class="step t-fam" data-step>
   <div class="shead"><div class="snum">4</div><div class="stitle">Protección para quienes más amas</div></div>
   <div class="feel b">El amor también se planea. Imagina que tu familia conserve su hogar y su tranquilidad, aunque tú llegues a faltar.</div>
   <div class="card" data-q='[
@@ -297,7 +335,7 @@
 </section>
 
 <!-- 5 EDUCACION -->
-<section class="step" data-step>
+<section class="step t-fam" data-step>
   <div class="shead"><div class="snum o">5</div><div class="stitle">El futuro de tus hijos</div></div>
   <div class="feel o">La educación de tus hijos no debería depender de la suerte. Hoy puedes garantizar que nada detenga sus sueños.</div>
   <div class="card ob" data-q='[
@@ -308,7 +346,7 @@
 </section>
 
 <!-- 6 RETIRO -->
-<section class="step" data-step>
+<section class="step t-ret" data-step>
   <div class="shead"><div class="snum">6</div><div class="stitle">Tu retiro con dignidad</div></div>
   <div class="feel b">Trabajas toda una vida para vivir tranquilo. ¿Prefieres depender de alguien, o disfrutar lo que construiste?</div>
   <div class="card" data-q='[
@@ -412,15 +450,40 @@ const prios=[
  "Atención médica privada de primer nivel",
  "Rentas vitalicias o fideicomiso"
 ];
+const prioMap=[
+  {step:4,label:'Protección para tu familia',cls:'th-fam'},
+  {step:5,label:'El futuro de tus hijos',cls:'th-fam'},
+  {step:6,label:'Tu retiro con dignidad',cls:'th-ret'},
+  {step:7,label:'Tus metas y proyectos',cls:'th-pro'},
+  {step:8,label:'Patrimonio y empresa',cls:'th-blu'},
+  {step:8,label:'Tu salud',cls:'th-blu'},
+  {step:6,label:'Rentas vitalicias / fideicomiso',cls:'th-ret'}
+];
 const pc=document.getElementById('prioCard');
 prios.forEach((p,i)=>{
-  const w=document.createElement('div');w.className='prio';
+  const m=prioMap[i]||{cls:''};
+  const w=document.createElement('div');w.className='prio '+m.cls;
   w.innerHTML='<div class="ptop"><div class="plab">'+String.fromCharCode(97+i)+') '+p+'</div><div class="pval" id="pv'+i+'">5</div></div><input type="range" min="1" max="10" value="5" step="1" oninput="setPrio('+i+',this.value)">';
   pc.appendChild(w);
 });
+function goTo(i){cur=i;render();}
+function updateSmart(){
+  const rows=[...document.querySelectorAll('#prioCard .prio')];
+  const hot=[];
+  rows.forEach((row,i)=>{const r=row.querySelector('input[type=range]');const v=r?parseInt(r.value):5;
+    row.classList.toggle('hot',v>=8);
+    if(v>=8)hot.push({i:i,v:v,m:prioMap[i]});});
+  const panel=document.getElementById('prioSmart');if(!panel)return;
+  if(!hot.length){panel.innerHTML='<div class="smart-hint">Desliza cada barra. Cuando marques algo en <b>8 o más</b>, aquí te sugeriré el tema en el que conviene profundizar. 💙</div>';return;}
+  hot.sort((a,b)=>b.v-a.v);
+  const seen={},uniq=[];hot.forEach(h=>{if(h.m&&!seen[h.m.step]){seen[h.m.step]=1;uniq.push(h);}});
+  let html='<div class="smart-h">Esto es lo que más te importa 💡</div><div class="smart-sub">Toca un tema para profundizar en la conversación ahora mismo:</div>';
+  uniq.forEach(h=>{html+='<button type="button" class="smart-card '+h.m.cls+'" onclick="goTo('+h.m.step+')"><span class="smart-lab">'+h.m.label+'</span><span class="smart-go">Profundizar &rarr;</span></button>';});
+  panel.innerHTML=html;
+}
 function setPrio(i,v){const el=document.getElementById('pv'+i);el.textContent=v;
   el.style.background=v>=8?'#F5821F':v>=5?'#1E6FC4':'#0451A5';
-  el.style.transform='scale(1.15)';setTimeout(()=>el.style.transform='scale(1)',150);saveState();}
+  el.style.transform='scale(1.15)';setTimeout(()=>el.style.transform='scale(1)',150);updateSmart();saveState();}
 
 /* ---- autosave (localStorage) ---- */
 const KEY='rg_deteccion_movil';
@@ -549,6 +612,7 @@ var _j=document.getElementById("jsoff");if(_j)_j.style.display="none";
 initExtras();
 restoreState();
 calc();
+updateSmart();
 render();
 </script>
 </body>
